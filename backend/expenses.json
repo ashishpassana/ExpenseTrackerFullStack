@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-01-10",
+    "category": "Food",
+    "amount": 500,
+    "description": "Mcd"
+  },
+  {
+    "date": "2026-01-10",
+    "category": "Travel",
+    "amount": 200,
+    "description": "cab"
+  }
+]
