@@ -8,8 +8,8 @@ const yearFilter = document.getElementById("yearFilter");
 
 let expenses = [];
 let chart;
+let editIndex = null;
 
-// 🔹 Load expenses from BACKEND
 window.onload = fetchExpenses;
 
 async function fetchExpenses() {
@@ -19,25 +19,30 @@ async function fetchExpenses() {
   updateChart();
 }
 
-// 🔹 Add Expense
 addBtn.addEventListener("click", async () => {
-  const date = document.getElementById("date").value;
-  const category = document.getElementById("category").value;
-  const amount = parseFloat(document.getElementById("amount").value);
-  const description = document.getElementById("description").value;
+  const expenseData = {
+    date: date.value,
+    category: category.value,
+    amount: parseFloat(amount.value),
+    description: description.value
+  };
 
-  if (!date || !amount) {
-    alert("Please fill date and amount");
-    return;
+  if (editIndex !== null) {
+    await fetch(`http://localhost:5000/expenses/${editIndex}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(expenseData)
+    });
+
+    editIndex = null;
+    addBtn.textContent = "Add Expense";
+  }else {
+    await fetch("http://localhost:5000/expenses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(expenseData)
+    });
   }
-
-  const expense = { date, category, amount, description };
-
-  await fetch("http://localhost:5000/expenses", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(expense),
-  });
 
   fetchExpenses();
 
@@ -46,7 +51,6 @@ addBtn.addEventListener("click", async () => {
   document.getElementById("description").value = "";
 });
 
-// 🔹 Delete Expense
 async function deleteExpense(index) {
   await fetch(`http://localhost:5000/expenses/${index}`, {
     method: "DELETE",
@@ -54,7 +58,19 @@ async function deleteExpense(index) {
   fetchExpenses();
 }
 
-// 🔹 Update Table with Filters
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    const index = e.target.dataset.index;
+    deleteExpense(index);
+  }
+
+  if (e.target.classList.contains("edit-btn")) {
+    const index = e.target.dataset.index;
+    editExpense(index);
+  }
+});
+
+
 function updateTable() {
   expenseTable.innerHTML = "";
   let total = 0;
@@ -71,19 +87,47 @@ function updateTable() {
 
     const row = expenseTable.insertRow();
     row.innerHTML = `
-      <td>${exp.date}</td>
-      <td>${exp.category}</td>
-      <td>₹${exp.amount.toFixed(2)}</td>
-      <td>${exp.description}</td>
-      <td><button onclick="deleteExpense(${index})">❌</button></td>
-    `;
+  <td>${exp.date}</td>
+  <td>${exp.category}</td>
+  <td>₹${exp.amount.toFixed(2)}</td>
+  <td>${exp.description}</td>
+
+  <td>
+    <button 
+      type="button" 
+      class="delete-btn" 
+      data-index="${index}">
+      ❌
+    </button>
+  </td>
+
+  <td>
+    <button 
+      type="button" 
+      class="edit-btn" 
+      data-index="${index}">
+      ✏️
+    </button>
+  </td>
+`;
     total += exp.amount;
   });
 
   totalDisplay.textContent = `Total: ₹${total.toFixed(2)}`;
 }
 
-// 🔹 Update Chart
+function editExpense(index) {
+  const exp = expenses[index];
+
+  date.value = exp.date;
+  category.value = exp.category;
+  amount.value = exp.amount;
+  description.value = exp.description;
+
+  editIndex = index;
+  addBtn.textContent = "Update Expense";
+}
+
 function updateChart() {
   const categories = {};
   const month = monthFilter.value;
@@ -122,7 +166,6 @@ function updateChart() {
   });
 }
 
-// 🔹 Filters
 monthFilter.addEventListener("change", () => {
   updateTable();
   updateChart();
@@ -132,3 +175,5 @@ yearFilter.addEventListener("input", () => {
   updateTable();
   updateChart();
 });
+
+
