@@ -6,7 +6,7 @@ A full-stack expense tracking application built using HTML, CSS, JavaScript, Nod
 
 ## Features
 
-- Add and delete expenses
+- Add edit and delete expenses
 - Filter expenses by month and year
 - Category-wise expense visualization using Chart.js
 - REST APIs built with Node.js and Express
