@@ -3,112 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index</title>
+  <title>Expense Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-100 text-slate-900">
+  <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+  <div class="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
+    
+    <div class="flex items-center gap-3">
 
-<div class="max-w-6xl mx-auto p-6">
+    <div
+        id="avatar"
+        class="w-9 h-9 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold"
+    >
+        A
+    </div>
 
-  <!-- HEADER -->
-  <header class="text-center mb-6">
-    <h1 class="text-4xl font-bold text-gray-800">Expense Tracker</h1>
-    <p class="text-gray-500">Track and visualize your daily expenses</p>
-  </header>
+    <span
+        id="userName"
+        class="font-medium text-slate-700"
+    ></span>
 
-  <!-- ADD EXPENSE -->
-  <div class="bg-white rounded-xl shadow p-6 mb-6">
-    <h2 class="text-2xl font-semibold mb-4">Add Expense</h2>
+    </div>
 
-    <div class="grid grid-cols-5 gap-3">
+    <div>
+      <h1 class="text-xl font-bold text-blue-700">
+        Expense Tracker
+      </h1>
+    </div>
 
-      <input id="date" type="date"
-        class="border rounded-lg p-2">
+    <div class="flex gap-6 text-sm font-medium">
+      <a href="#" class="text-blue-700 font-medium hover:text-blue-500 transition duration-200">Dashboard</a>
+      <a href="analytics.html" class="text-slate-600 hover:text-blue-700">Analytics</a>
 
-      <select id="category"
-        class="border rounded-lg p-2">
-        <option>Food</option>
-        <option>Travel</option>
-        <option>Shopping</option>
-        <option>Bills</option>
-        <option>Other</option>
-      </select>
-
-      <input id="amount" type="number"
-        placeholder="₹ Amount"
-        class="border rounded-lg p-2">
-
-      <input id="description" type="text"
-        placeholder="Description"
-        class="border rounded-lg p-2">
-
-      <button id="addBtn" type="button"
-        class="bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-        Add Expense
+      <button id="logoutBtn" class="text-red-600 font-semibold">
+      Logout
       </button>
 
     </div>
   </div>
+</nav>
+  <main class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+    <header class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">Personal finance</p>
+        <p class="mt-1 text-slate-500">Track spending, filter trends, and keep your monthly total visible.</p>
+      </div>
+      <div id="statusMessage" class="hidden rounded-lg border px-4 py-3 text-sm"></div>
+    </header>
 
-  <!-- FILTERS -->
-  <div class="bg-white rounded-xl shadow p-6 mb-6">
-    <h2 class="text-2xl font-semibold mb-4">Filters</h2>
+    <section class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-    <div class="grid grid-cols-2 gap-3">
-      <select class="border rounded-lg p-2">
-        <option>All Months</option>
-      </select>
-
-      <input type="text" placeholder="YYYY"
-        class="border rounded-lg p-2">
+  <div class="rounded-xl bg-white p-5 shadow-sm hover:shadow-lg transition duration-300">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">💰</span>
+      <p class="text-sm text-slate-500">Filtered Total</p>
     </div>
+
+    <p id="totalAmount" class="mt-2 text-3xl font-bold text-blue-700">
+      &#8377;0
+    </p>
   </div>
 
-  <!-- TABLE + CHART -->
-  <div class="grid grid-cols-3 gap-4">
-
-    <!-- EXPENSE TABLE -->
-    <div class="col-span-2 bg-white rounded-xl shadow p-6">
-      <h2 class="text-2xl font-semibold mb-4">Expense List</h2>
-
-      <table class="w-full text-sm">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="p-2 text-left">Date</th>
-            <th class="p-2 text-left">Category</th>
-            <th class="p-2 text-left">Amount (₹)</th>
-            <th class="p-2 text-left">Description</th>
-            <th class="p-2">Delete</th>
-          </tr>
-        </thead>
-
-        <tbody id="expenseTable"></tbody>
-      </table>
-
-      <p class="text-right mt-4 text-blue-600 font-bold">
-        Total: <span id="totalAmount">₹0</span>
-      </p>
+  <div class="rounded-xl bg-white p-5 shadow-sm hover:shadow-lg transition duration-300">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📊</span>
+      <p class="text-sm text-slate-500">Transactions</p>
     </div>
 
-    <!-- CHART -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h2 class="text-2xl font-semibold mb-4">Expense Breakdown</h2>
-      <canvas id="expenseChart"></canvas>
-    </div>
-
+    <p id="transactionCount" class="mt-2 text-3xl font-bold">
+      0
+    </p>
   </div>
 
-</div>
+  <div class="rounded-xl bg-white p-5 shadow-sm hover:shadow-lg transition duration-300">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📈</span>
+      <p class="text-sm text-slate-500">Average Spend</p>
+    </div>
 
-<!-- JS -->
-<script src="js/api.js"></script>
-<script src="js/script.js"></script>
+    <p id="averageAmount" class="mt-2 text-3xl font-bold">
+      &#8377;0
+    </p>
+  </div>
 
+  <div class="rounded-xl bg-white p-5 shadow-sm hover:shadow-lg transition duration-300">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">🏆</span>
+      <p class="text-sm text-slate-500">Top Category</p>
+    </div>
+
+    <p id="topCategory" class="mt-2 text-3xl font-bold">
+      -
+    </p>
+  </div>
+
+</section>
+
+    <section class="mb-6 rounded-lg bg-white p-5 shadow-sm hover:shadow-md transition duration-300">
+      <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-xl font-semibold">Add Expense</h2>
+        <button id="cancelEditBtn" type="button" class="hidden text-sm font-semibold text-slate-500 hover:text-slate-900">
+          Cancel edit
+        </button>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <input id="date" type="date" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+
+        <select id="category" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+          <option>Food</option>
+          <option>Travel</option>
+          <option>Shopping</option>
+          <option>Bills</option>
+          <option>Other</option>
+        </select>
+
+        <input id="amount" type="number" min="0" step="0.01" placeholder="Amount" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+
+        <input id="description" type="text" placeholder="Description" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+
+        <button id="addBtn" type="button" class="rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white hover:bg-blue-800">
+          Add Expense
+        </button>
+      </div>
+    </section>
+
+    <section class="mb-6 rounded-lg bg-white p-5 shadow-sm">
+      <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-xl font-semibold">Filters</h2>
+        <button id="clearFiltersBtn" type="button" class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+          Clear filters
+        </button>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <select id="monthFilter" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+          <option value="">All months</option>
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+
+        <input id="yearFilter" type="number" min="2000" max="2100" placeholder="Year" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+
+        <select id="categoryFilter" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+          <option value="">All categories</option>
+          <option>Food</option>
+          <option>Travel</option>
+          <option>Shopping</option>
+          <option>Bills</option>
+          <option>Other</option>
+        </select>
+
+        <input id="searchFilter" type="search" placeholder="Search description" class="rounded-lg border border-slate-300 p-3 outline-none focus:border-blue-500">
+      </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-3">
+      <div class="rounded-lg bg-white p-5 shadow-sm hover:shadow-md transition duration-300 lg:col-span-2">
+        <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <h2 class="text-xl font-semibold">Expense List</h2>
+          <p id="activeFilterLabel" class="text-sm text-slate-500">Showing all expenses</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[720px] text-sm">
+            <thead class="bg-slate-100 text-slate-600">
+              <tr>
+                <th class="p-3 text-left">Date</th>
+                <th class="p-3 text-left">Category</th>
+                <th class="p-3 text-right">Amount</th>
+                <th class="p-3 text-left">Description</th>
+                <th class="p-3 text-center">Edit</th>
+                <th class="p-3 text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTable"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="hidden rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
+          <div class="text-4xl mb-3">📭</div>
+            <p>No expenses match the current filters.</p>
+            <p class="mt-2 text-sm text-slate-400">
+               Try clearing filters or add a new expense.
+            </p>
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-white p-5 shadow-sm hover:shadow-md transition duration-300">
+        <h2 class="mb-4 text-xl font-semibold">Expense Breakdown</h2>
+        <div class="h-[420px] flex items-center justify-center">
+          <canvas id="expenseChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
 </body>
-
-
 </html>
-

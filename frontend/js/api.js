@@ -1,58 +1,84 @@
+const AUTH_URL = "http://localhost:5000/auth";
 const BASE_URL = "http://localhost:5000/expenses";
 
-// GET all expenses
+function getAuthHeaders(){ //helper function
+  const token = localStorage.getItem("token");
+
+  return{
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+async function parseResponse(res) {
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(
+    data.message ||
+    data.error ||
+    "Something went wrong."
+  )};
+
+  return data;
+}
+
+async function loginUser(userData) {
+  const res = await fetch(`${AUTH_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  return parseResponse(res);
+}
+
+async function registerUser(userData) {
+  const res = await fetch(`${AUTH_URL}/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  return parseResponse(res);
+}
+
 async function getExpenses() {
-  try {
-    const res = await fetch(BASE_URL);
-    return await res.json();
-  } catch (err) {
-    console.error("Error fetching expenses:", err);
-  }
+  const res = await fetch(BASE_URL,{
+    headers: getAuthHeaders(),
+  });
+  return parseResponse(res);
 }
 
-// ADD new expense
 async function addExpense(expense) {
-  try {
-    const res = await fetch(BASE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(expense),
-    });
+  const res = await fetch(BASE_URL, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(expense),
+  });
 
-    return await res.json();
-  } catch (err) {
-    console.error("Error adding expense:", err);
-  }
+  return parseResponse(res);
 }
 
-// DELETE expense
 async function deleteExpense(id) {
-  try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
-      method: "DELETE",
-    });
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
 
-    return await res.json();
-  } catch (err) {
-    console.error("Error deleting expense:", err);
-  }
+  return parseResponse(res);
 }
 
-// UPDATE expense
 async function updateExpense(id, updatedData) {
-  try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedData),
-    });
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(updatedData),
+  });
 
-    return await res.json();
-  } catch (err) {
-    console.error("Error updating expense:", err);
-  }
+  return parseResponse(res);
 }

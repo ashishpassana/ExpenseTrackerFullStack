@@ -1,48 +1,116 @@
-const fs = require("fs");
-const path = require("path");
+const Expense = require("../models/expense");
 
-const FILE = path.join(__dirname, "../data/expenses.json");
+const cleanExpenseInput = (body) => {
+  const amount = Number(body.amount);
+  const date = String(body.date || "").trim();
+  const category = String(body.category || "").trim();
+  const description = String(body.description || "").trim();
 
-const readData = () => {
-  const data = fs.readFileSync(FILE, "utf-8");
-  return data ? JSON.parse(data) : [];
-};
+  if (!date || Number.isNaN(Date.parse(date))) {
+    return { error: "A valid date is required." };
+  }
 
-const writeData = (data) => {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
-};
+  if (!category) {
+    return { error: "Category is required." };
+  }
 
-exports.getExpenses = (req, res) => {
-  res.json(readData());
-};
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { error: "Amount must be greater than zero." };
+  }
 
-exports.addExpense = (req, res) => {
-  const expenses = readData();
-  const newExpense = {
-    id: Date.now(),
-    ...req.body,
+  return {
+    value: {
+      date,
+      category,
+      amount: Number(amount.toFixed(2)),
+      description,
+    },
   };
-  expenses.push(newExpense);
-  writeData(expenses);
-  res.json(newExpense);
 };
 
-exports.deleteExpense = (req, res) => {
-  const id = Number(req.params.id);
-  const expenses = readData().filter(exp => exp.id !== id);
-  writeData(expenses);
-  res.json({ message: "Deleted" });
+
+exports.getExpenses = async (req, res) => {
+  try {
+    const expenses = await Expense.find({
+      user: req.user.id,
+    }).sort({ date: -1 });
+    res.json(expenses);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-exports.updateExpense = (req, res) => {
-  const id = Number(req.params.id);
-  const expenses = readData();
-  const index = expenses.findIndex(exp => exp.id === id);
 
-  if (index === -1) return res.status(404).json({ error: "Not found" });
+exports.addExpense = async (req, res) => {
+  try {
+    const { error, value } = cleanExpenseInput(req.body);
 
-  expenses[index] = { ...expenses[index], ...req.body };
-  writeData(expenses);
+    if (error) {
+      return res.status(400).json({ error });
+    }
 
-  res.json(expenses[index]);
+    const expense = await Expense.create({
+      ...value,   
+      user: req.user.id,
+    });
+
+    res.status(201).json(expense);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.deleteExpense = async (req, res) => {
+  try {
+    const expense = await Expense.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!expense) {
+      return res.status(404).json({ error: "Expense not found." });
+    }
+
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.updateExpense = async (req, res) => {
+  try {
+    const expense = await Expense.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!expense) {
+      return res.status(404).json({ error: "Expense not found." });
+    }
+
+    const { error, value } = cleanExpenseInput({
+      ...expense.toObject(),
+      ...req.body,
+    });
+
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    const updatedExpense = await Expense.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.user.id,
+      },
+      value,
+      { new: true,
+        runValidators: true }
+    );
+
+    res.json(updatedExpense);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
