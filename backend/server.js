@@ -16,6 +16,9 @@ app.use(cors({
   origin: "https://expense-tracker-full-stack-zeta.vercel.app",
   credentials: true
 }));
+
+// app.use(cors());  ---> For testing Locally
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
