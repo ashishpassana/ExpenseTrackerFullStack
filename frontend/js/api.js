@@ -1,6 +1,9 @@
 const AUTH_URL = "https://expensetrackerfullstack-8fkb.onrender.com/auth";
 const BASE_URL = "https://expensetrackerfullstack-8fkb.onrender.com/expenses";
 
+// const AUTH_URL = "http://localhost:5000/auth";
+// const BASE_URL = "http://localhost:5000/expenses";   ----> For testing Locally
+
 function getAuthHeaders(){ //helper function
   const token = localStorage.getItem("token");
 

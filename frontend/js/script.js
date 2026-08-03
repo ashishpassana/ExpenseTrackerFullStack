@@ -127,11 +127,19 @@ function updateFilterLabel(expenses) {
     : "Showing all expenses";
 }
 
+function formatDate(date) {
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 function renderTable(expenses) {
   elements.table.innerHTML = expenses
     .map((expense) => `
       <tr class="border-b border-slate-100 hover:bg-slate-50">
-        <td class="p-3">${escapeHtml(expense.date)}</td>
+        <td class="p-3">${formatDate(expense.date)}</td>
         <td class="p-3">
           <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">${escapeHtml(expense.category)}</span>
         </td>
