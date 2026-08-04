@@ -5,6 +5,7 @@ const elements = {
   totalCategories: document.getElementById("totalCategories"),
   monthlyChart: document.getElementById("monthlyChart"),
   categoryChart: document.getElementById("categoryChart"),
+  logoutBtn: document.getElementById("logoutBtn"),
 };
 
 let monthlyChartInstance = null;
@@ -108,6 +109,13 @@ function updateStats(expenses) {
     uniqueCategories.size;
 
 }
+
+
+elements.logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("userName");
+  window.location.href = "login.html";
+});
 
 function renderMonthlyChart(expenses) {
 

@@ -17,7 +17,7 @@ app.use(cors({
   credentials: true
 }));
 
-// app.use(cors());  ---> For testing Locally
+// app.use(cors());  //---> For testing Locally
 
 app.use(express.json());
 
